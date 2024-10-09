@@ -12,12 +12,18 @@ phases:
       - echo "check files"
       - pwd
       - ls
-      
+      - echo Logging in to CodeArtifacts
+      - aws codeartifact login --tool pip --domain $CODE_ARTIFACTS_DOMAIN_NAME --domain-owner $CODE_ARTIFACTS_OWNER --repository $CODE_ARTIFACTS_REPO_NAME --region $CODE_ARTIFACTS_REGION
+      - export CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain ${CODE_ARTIFACTS_DOMAIN_NAME} --domain-owner ${CODE_ARTIFACTS_OWNER} --region ${CODE_ARTIFACTS_REGION} --query authorizationToken --output text)
+      - export PIP_EXTRA_INDEX_URL="https://aws:${CODEARTIFACT_AUTH_TOKEN}@${CODE_ARTIFACTS_DOMAIN_NAME}-${CODE_ARTIFACTS_OWNER}.d.codeartifact.${CODE_ARTIFACTS_REGION}.amazonaws.com/pypi/${CODE_ARTIFACTS_REPO_NAME}/simple/"
+      - echo $PIP_EXTRA_INDEX_URL
+
+
   build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...          
-      - docker build -t $REPOSITORY_URI:$IMAGE_TAG .
+      - docker build -t $REPOSITORY_URI:$IMAGE_TAG . --build-arg PIP_EXTRA_INDEX_URL=$PIP_EXTRA_INDEX_URL --build-arg CODE_ARTIFACTS_DOMAIN_NAME=$CODE_ARTIFACTS_DOMAIN_NAME --build-arg CODE_ARTIFACTS_OWNER=$CODE_ARTIFACTS_OWNER  --build-arg CODE_ARTIFACTS_REPO_NAME=$CODE_ARTIFACTS_REPO_NAME --build-arg CODE_ARTIFACTS_REGION=$CODE_ARTIFACTS_REGION --build-arg CODEARTIFACT_AUTH_TOKEN=$CODEARTIFACT_AUTH_TOKEN
       - docker images
 
   post_build:

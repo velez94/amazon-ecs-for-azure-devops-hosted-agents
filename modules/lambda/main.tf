@@ -40,7 +40,7 @@ resource "aws_lambda_function" "lambda_function" {
   count = var.create_layer ? 1 : 0
 
   provisioner "local-exec" {
-    command     = "cd ${var.source_path} && mkdir python && pip install -r requirements.txt -t python/ -U && zip -r ../../${path.module}/lambda_layer_package.zip python/"
+    command     = "cd ${var.source_path} && mkdir python && pip install -r general.txt -t python/ -U && zip -r ../../${path.module}/lambda_layer_package.zip python/"
     interpreter = ["bash", "-c"]
   }
   triggers = {

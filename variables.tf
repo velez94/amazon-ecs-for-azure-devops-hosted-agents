@@ -4,11 +4,6 @@
 #http://aws.amazon.com/agreement or other written agreement between Customer and either
 #Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
 
-variable "provider_region" {
-  description = "AWS Region where the resources will be deployed"
-  type        = string
-}
-
 variable "project_name" {
   description = "Unique name for this project"
   type        = string
@@ -161,4 +156,47 @@ variable "ecs_ado_patsecret_name" {
 variable "ecs_ado_patsecret_description" {
   default = "This secret is used at runtime by ECS Tasks to connect to ADO to setup agents"
   type    = string
+}
+
+variable "code_artifacts_repo_name" {
+  type        = string
+  description = "Code Artifacts Repository Name"
+}
+variable "code_artifacts_domain_name" {
+  type        = string
+  description = "Code Artifacts Domain Name"
+}
+
+variable "code_artifacts_owner" {
+  type        = string
+  description = "Code Artifacts Owner"
+}
+
+variable "code_artifacts_region" {
+  type        = string
+  description = "Code artifacts region"
+}
+
+########################################################################################################################
+# Remote state
+########################################################################################################################
+variable "remote_state_bucket_arn" {
+  type        = string
+  description = "Remote state bucket ARN"
+}
+variable "remote_state_table_arn" {
+  type = string
+  description = "Remote state table ARN"
+}
+########################################################################################################################
+# Environments account values
+########################################################################################################################
+variable "terraform_project_name" {
+  type        = string
+  description = "Terraform project name"
+}
+
+variable "default_workload_account" {
+  type = string
+  description = "Workload account id for default environment"
 }

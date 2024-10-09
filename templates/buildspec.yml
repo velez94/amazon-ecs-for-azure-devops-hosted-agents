@@ -1,24 +1,35 @@
-#This solution, non-production-ready template describes AWS Codepipeline based CICD Pipeline for terraform code deployment.
-#© 2024 Amazon Web Services, Inc. or its affiliates. All Rights Reserved.
-#This AWS Content is provided subject to the terms of the AWS Customer Agreement available at
-#http://aws.amazon.com/agreement or other written agreement between Customer and either
-#Amazon Web Services, Inc. or Amazon Web Services EMEA SARL or both.
-
 version: 0.2
+run-as: root
 
 phases:
+
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME
+      - echo $REPOSITORY_URI
+      - echo "check files"
+      - pwd
+      - ls
+      - echo Logging in to CodeArtifacts
+      - aws codeartifact login --tool pip --domain $CODE_ARTIFACTS_DOMAIN_NAME --domain-owner $CODE_ARTIFACTS_OWNER --repository $CODE_ARTIFACTS_REPO_NAME --region $CODE_ARTIFACTS_REGION
+      - export CODEARTIFACT_AUTH_TOKEN=$(aws codeartifact get-authorization-token --domain ${CODE_ARTIFACTS_DOMAIN_NAME} --domain-owner ${CODE_ARTIFACTS_OWNER} --region ${CODE_ARTIFACTS_REGION} --query authorizationToken --output text)
+      - export PIP_EXTRA_INDEX_URL="https://aws:${CODEARTIFACT_AUTH_TOKEN}@${CODE_ARTIFACTS_DOMAIN_NAME}-${CODE_ARTIFACTS_OWNER}.d.codeartifact.${CODE_ARTIFACTS_REGION}.amazonaws.com/pypi/${CODE_ARTIFACTS_REPO_NAME}/simple/"
+      - echo $PIP_EXTRA_INDEX_URL
+
+
   build:
     commands:
       - echo Build started on `date`
-      - echo Building the Docker image...
-      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
-      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - echo Building the Docker image...          
+      - docker build -t $REPOSITORY_URI:$IMAGE_TAG . --build-arg PIP_EXTRA_INDEX_URL=$PIP_EXTRA_INDEX_URL --build-arg CODE_ARTIFACTS_DOMAIN_NAME=$CODE_ARTIFACTS_DOMAIN_NAME --build-arg CODE_ARTIFACTS_OWNER=$CODE_ARTIFACTS_OWNER  --build-arg CODE_ARTIFACTS_REPO_NAME=$CODE_ARTIFACTS_REPO_NAME --build-arg CODE_ARTIFACTS_REGION=$CODE_ARTIFACTS_REGION --build-arg CODEARTIFACT_AUTH_TOKEN=$CODEARTIFACT_AUTH_TOKEN
+      - docker images
+
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Push the latest image to cluster

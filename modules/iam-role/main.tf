@@ -136,7 +136,25 @@ resource "aws_iam_policy" "codepipeline_policy" {
         "logs:PutLogEvents"
       ],
       "Resource": "arn:${data.aws_partition.current.partition}:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:*"
-    }
+    },
+    {
+              "Effect": "Allow",
+              "Action": [ "codeartifact:GetAuthorizationToken",
+                          "codeartifact:GetRepositoryEndpoint",
+                          "codeartifact:ReadFromRepository"
+                          ],
+              "Resource": "*"
+          },
+      {
+          "Effect": "Allow",
+          "Action": "sts:GetServiceBearerToken",
+          "Resource": "*",
+          "Condition": {
+              "StringEquals": {
+                  "sts:AWSServiceName": "codeartifact.amazonaws.com"
+              }
+          }
+      }
   ]
 }
 EOF
@@ -159,7 +177,7 @@ data "aws_iam_policy_document" "assume_role_policy" {
     actions = ["sts:AssumeRole"]
 
     principals {
-      type        = "Service"
+      type = "Service"
       identifiers = ["ecs-tasks.amazonaws.com"]
     }
   }

@@ -42,6 +42,7 @@ module "codecommit_ado_agent_repo" {
 }
 
 # Module for Infrastructure Validation - CodeBuild
+
 module "codebuild" {
   depends_on = [
     module.codecommit_ado_agent_repo
@@ -61,6 +62,11 @@ module "codebuild" {
   ecr_repository_name                 = var.ecr_repo_name
   build_spec                          = data.local_file.buildspec_local.content
   container_image_tag                 = var.container_image_tag
+  code_artifacts_domain_name          = var.code_artifacts_domain_name
+  code_artifacts_repo_name            = var.code_artifacts_repo_name
+  code_artifacts_owner                = var.code_artifacts_owner
+  code_artifacts_region               = var.code_artifacts_region
+
   tags = {
     Project_Name = var.project_name
     Environment  = var.environment
@@ -85,7 +91,7 @@ module "codepipeline_iam_role" {
   source                            = "./modules/iam-role"
   project_name                      = var.project_name
   create_new_role                   = var.create_new_role
-  codepipeline_iam_role_name        = var.create_new_role == true ? "${var.project_name}-codepipeline-role" : var.codepipeline_iam_role_name
+  codepipeline_iam_role_name        = var.create_new_role == true ? "${var.project_name}-codepipeline-role" :    var.codepipeline_iam_role_name
   source_repository_name            = var.source_repo_name
   kms_key_arn                       = module.codepipeline_kms.arn
   s3_bucket_arn                     = module.s3_artifacts_bucket.arn
@@ -150,6 +156,8 @@ module "iam_ecs_task_role" {
   iam_role_policy        = data.aws_iam_policy_document.ecs_task_role_policy.json
 }
 
+
+
 resource "aws_cloudwatch_log_group" "ecs_log_group" {
   name              = "/ecs/ecs_ado"
   retention_in_days = 30
@@ -180,7 +188,7 @@ module "ecs" {
   ecs_service_name            = "${local.prefix}-ecs-svc-${var.environment}"
   ecs_service_count           = var.ecs_service_count
   ecs_service_security_groups = [var.security_groups]
-  ecs_subnets                 = [var.subnet_ids]
+  ecs_subnets = [var.subnet_ids]
 }
 
 # Lambda Releated resource
@@ -257,4 +265,22 @@ module "ecs_ado_api" {
   apigw_lambda_arn      = "arn:aws:apigateway:${data.aws_region.current.name}:lambda:path/2015-03-31/functions/${module.create_task_lambda.lambda_function_arn}/invocations"
   function_name         = module.create_task_lambda.lambda_function_name
   tags                  = local.resource_tags
+}
+
+########################################################################################################################
+# Environments account resources for deployment
+########################################################################################################################
+module "iam_backend_role_terraform" {
+  source                 = "./modules/iam"
+  iam_role_name          = "${local.prefix}-terraform-backend-${var.environment}"
+  iam_assume_role_policy = data.aws_iam_policy_document.remote_assume_role_policy.json
+  iam_role_policy        = data.aws_iam_policy_document.remote_state_role_policy.json
+}
+
+module "iam_deployment_read_role_terraform" {
+  source                 = "./modules/iam"
+  iam_role_name          = "${var.terraform_project_name}-terraform-read"
+  iam_assume_role_policy = data.aws_iam_policy_document.readonly_assume_role_policy.json
+  iam_role_policy        = data.aws_iam_policy_document.readonly_state_role_policy.json
+  iam_managed_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
 }

@@ -1,6 +1,7 @@
 resource "aws_iam_role" "iam_role" {
   name                  = var.iam_role_name
   assume_role_policy    = var.iam_assume_role_policy
+  managed_policy_arns = var.iam_managed_policy_arns
 }
  
 resource "aws_iam_policy" "iam_role_policy" {

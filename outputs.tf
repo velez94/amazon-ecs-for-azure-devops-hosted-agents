@@ -17,3 +17,7 @@ output "ecs_ado_pat_secret_arn" {
   value       = aws_secretsmanager_secret.ecs_ado_pat.arn
   description = "Secret ARN to update with ADO PAT to setup agents"
 }
+output "remote_state_role_arn" {
+  value = module.iam_backend_role_terraform
+  description = "Remote role backend arn"
+}

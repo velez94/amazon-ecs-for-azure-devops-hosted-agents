@@ -74,3 +74,23 @@ variable "container_image_tag" {
   type        = string
   description = "ECR Container Image Tag"
 }
+
+variable "code_artifacts_repo_name" {
+  type        = string
+  description = "Code Artifacts Repository Name"
+}
+variable "code_artifacts_domain_name" {
+  type        = string
+  description = "Code Artifacts Domain Name"
+}
+
+variable "code_artifacts_owner" {
+  type        = string
+  description = "Code Artifacts Owner"
+}
+
+
+variable "code_artifacts_region" {
+  type        = string
+  description = "Code artifacts region"
+}

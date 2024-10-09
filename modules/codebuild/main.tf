@@ -37,6 +37,22 @@ resource "aws_codebuild_project" "terraform_codebuild_project" {
       name  = "IMAGE_TAG"
       value = var.container_image_tag
     }
+    environment_variable {
+      name  = "CODE_ARTIFACTS_DOMAIN_NAME"
+      value = var.code_artifacts_domain_name
+    }
+    environment_variable {
+      name  = "CODE_ARTIFACTS_OWNER"
+      value = var.code_artifacts_owner
+    }
+    environment_variable {
+      name  = "CODE_ARTIFACTS_REPO_NAME"
+      value = var.code_artifacts_repo_name
+    }
+    environment_variable {
+      name  = "CODE_ARTIFACTS_REGION"
+      value = var.code_artifacts_region
+    }
   }
   logs_config {
     cloudwatch_logs {
