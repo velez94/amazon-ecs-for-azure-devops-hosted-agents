@@ -34,7 +34,12 @@ RUN apt-get install -y python3-pip \
    && pip3 install --upgrade pip \
    && python3 -V \
    && pip --version
-#RUN ln -s /usr/bin/python3 python
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN set -ex \
+    && apt-get update \
+    && apt-get install figlet jq tree xvfb libfontconfig wkhtmltopdf graphviz gawk golint -y -qq \
+    &&  rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 ################################
 # Install AWS CLI
@@ -60,6 +65,7 @@ RUN curl --proto '=https' --tlsv1.2 -fsSL https://get.opentofu.org/install-opent
     && chmod +x install-opentofu.sh \
     && ./install-opentofu.sh --install-method deb \
     && rm -f install-opentofu.sh
+
 
 # Terragrunt
 ARG TERRAGRUNT_VERSION=0.67.15
@@ -88,7 +94,13 @@ WORKDIR /azp/
 COPY ./start.sh ./
 RUN chmod +x ./start.sh &&\
     useradd agent && mkdir -p /home/agent/.azure-devops \
-    && chown agent ./ && chown -R agent /home/agent/
+    && chown agent ./ \
+    && mkdir -p /home/agent/.terraform.d/plugin-cache  \
+    && echo 'plugin_cache_dir   = "/home/agent/.terraform.d/plugin-cache"' > ~/.terraformrc \
+    && echo 'plugin_cache_may_break_dependency_lock_file = true' > ~/.terraformrc \
+    && echo 'plugin_cache_dir   = "/home/agent/.terraform.d/plugin-cache"' > ~/.tofurc \
+    && echo 'plugin_cache_may_break_dependency_lock_file = true' > ~/.tofurc \
+    && chown -R agent /home/agent/
 
 USER agent
 # Another option is to run the agent as root.

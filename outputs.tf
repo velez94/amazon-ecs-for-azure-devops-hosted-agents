@@ -21,3 +21,8 @@ output "remote_state_role_arn" {
   value = module.iam_backend_role_terraform
   description = "Remote role backend arn"
 }
+
+output "terraform_read_role_arn" {
+  value = module.iam_deployment_read_role_terraform
+  description = "Role for read operations"
+}

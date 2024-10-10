@@ -56,11 +56,11 @@ data "aws_iam_policy_document" "ecs_task_role_policy" {
     actions = ["*"]
     resources = ["*"]
 
-   #condition {
-   #  test = "StringEquals"
-   #  variable = "aws:RequestedRegion"
-   #  values = [data.aws_region.current.name, "us-east-2"]
-   #}
+    #condition {
+    #  test = "StringEquals"
+    #  variable = "aws:RequestedRegion"
+    #  values = [data.aws_region.current.name, "us-east-2"]
+    #}
   }
 
 
@@ -183,14 +183,29 @@ data "aws_iam_policy_document" "remote_assume_role_policy" {
 }
 
 
-
 data "aws_iam_policy_document" "remote_state_role_policy" {
   statement {
     actions = [
-      "s3:ListBucket",
+      "s3:DeleteObject",
       "s3:GetObject",
       "s3:PutObject",
-      "s3:DeleteObject"
+      "s3:ListBucket",
+      "s3:GetBucketVersioning",
+      "s3:GetBucketAcl",
+      "s3:GetBucketLogging",
+      "s3:CreateBucket",
+      "s3:PutBucketPublicAccessBlock",
+      "s3:PutBucketTagging",
+      "s3:PutBucketPolicy",
+      "s3:PutBucketVersioning",
+      "s3:PutEncryptionConfiguration",
+      "s3:PutBucketAcl",
+      "s3:PutBucketLogging",
+      "s3:GetEncryptionConfiguration",
+      "s3:GetBucketPolicy",
+      "s3:GetBucketPublicAccessBlock",
+      "s3:PutLifecycleConfiguration",
+      "s3:PutBucketOwnershipControls"
     ]
     resources = [
       var.remote_state_bucket_arn,
@@ -199,6 +214,7 @@ data "aws_iam_policy_document" "remote_state_role_policy" {
   }
   statement {
     actions = [
+      "dynamodb:DescribeTable",
       "dynamodb:GetItem",
       "dynamodb:PutItem",
       "dynamodb:DeleteItem"
@@ -230,12 +246,12 @@ data "aws_iam_policy_document" "readonly_assume_role_policy" {
 data "aws_iam_policy_document" "readonly_state_role_policy" {
   statement {
     actions = [
-     "secretsmanager:GetRandomPassword",
-          "secretsmanager:GetResourcePolicy",
-          "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret",
-          "secretsmanager:ListSecretVersionIds",
-          "secretsmanager:ListSecrets"
+      "secretsmanager:GetRandomPassword",
+      "secretsmanager:GetResourcePolicy",
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecretVersionIds",
+      "secretsmanager:ListSecrets"
     ]
     resources = [
       "*"
@@ -244,27 +260,28 @@ data "aws_iam_policy_document" "readonly_state_role_policy" {
     condition {
       test     = "StringEquals"
       values = [var.terraform_project_name]
-      variable =  "aws:ResourceTag/Project"
+      variable = "aws:ResourceTag/Project"
     }
   }
   statement {
     actions = [
-     "application-autoscaling:List*"
+      "application-autoscaling:List*"
     ]
     resources = ["*"]
   }
   statement {
     actions = [
       "kms:Decrypt",
-          "kms:DescribeKey"
+      "kms:DescribeKey"
     ]
-    resources = ["arn:aws:kms:*:${var.default_workload_account}:key/*"] # todo change for multiple account using providers
+    resources = ["arn:aws:kms:*:${var.default_workload_account}:key/*"]
+    # todo change for multiple account using providers
     #resources = ["arn:aws:kms:*:${data.aws_caller_identity.current.account_id}:key/*"]
     effect = "Allow"
     condition {
       test     = "StringEquals"
       values = [var.terraform_project_name]
-      variable =  "aws:ResourceTag/Project"
+      variable = "aws:ResourceTag/Project"
     }
   }
 }
