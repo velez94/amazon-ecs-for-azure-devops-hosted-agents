@@ -285,3 +285,61 @@ data "aws_iam_policy_document" "readonly_state_role_policy" {
     }
   }
 }
+data "aws_iam_policy_document" "deploy_state_role_policy" {
+  statement {
+    actions = [
+     "ec2:*",
+      "s3:*",
+      "rds:*",
+      "iam:*",
+      "elasticloadbalancing:*",
+      "acm:*",
+      "cloudwatch:*",
+      "autoscaling:*",
+      "dynamodb:*",
+      "lambda:*",
+      "sns:*",
+      "sqs:*",
+      "vpc:*",
+      "cloudformation:*",
+      "route53:*",
+      "application-autoscaling:*",
+      "autoscaling:*",
+      "kms:*",
+      "msk:*",
+      "ecr:*",
+      "ecs:*",
+      "secretsmanager:*",
+      "logs:*",
+      "elasticache:*",
+      "glue:*",
+      "athena:*",
+      "redshift:*",
+      "dms:*",
+      "cloudfront:*",
+      "apigateway:*",
+      "kinesis:*",
+      "firehose:*",
+      "stepfunctions:*",
+      "glue:*",
+      "dms:*",
+      "events:*",
+      "s3:*",
+      "logs:*",
+      "cloudwatch:*",
+      "waf:*",
+      "waf-regional:*",
+      "ssm:*",
+    ]
+    resources = [
+      "*"
+    ]
+    effect = "Allow"
+    condition {
+      test     = "StringEquals"
+      values = [var.terraform_project_name]
+      variable = "aws:ResourceTag/Project"
+    }
+  }
+
+}

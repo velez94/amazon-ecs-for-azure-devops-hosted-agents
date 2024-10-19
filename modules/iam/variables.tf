@@ -11,6 +11,7 @@ variable "iam_assume_role_policy" {
 variable "iam_role_policy" {
     description = "Policy document to be attached to the IAM role created"
     type = string
+
 }
 
 variable "iam_managed_policy_arns" {

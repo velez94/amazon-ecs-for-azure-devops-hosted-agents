@@ -26,3 +26,7 @@ output "terraform_read_role_arn" {
   value = module.iam_deployment_read_role_terraform
   description = "Role for read operations"
 }
+output "terraform_write_role_arn" {
+  value = module.iam_deployment_write_role_terraform
+  description = "Role for read operations"
+}

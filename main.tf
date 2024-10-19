@@ -284,3 +284,10 @@ module "iam_deployment_read_role_terraform" {
   iam_role_policy        = data.aws_iam_policy_document.readonly_state_role_policy.json
   iam_managed_policy_arns = ["arn:aws:iam::aws:policy/ReadOnlyAccess"]
 }
+module "iam_deployment_write_role_terraform" {
+  source                 = "./modules/iam"
+  iam_role_name          = "${var.terraform_project_name}-terraform-write"
+  iam_assume_role_policy = data.aws_iam_policy_document.readonly_assume_role_policy.json
+  iam_role_policy        = data.aws_iam_policy_document.deploy_state_role_policy.json
+  iam_managed_policy_arns = ["arn:aws:iam::aws:policy/AdministratorAccess"]
+}
