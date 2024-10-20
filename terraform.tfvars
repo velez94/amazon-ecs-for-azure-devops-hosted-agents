@@ -21,7 +21,7 @@ container_env_vars = [
 ]
 container_port         = 80
 container_host_port    = 80
-ecs_service_count      = "2"
+ecs_service_count      = "1"
 container_image_tag    = "ado-ecs"
 ecr_repo_name          = "ado-ecs-ecr"
 ecs_cluster_name       = "ado-ecs"
@@ -30,7 +30,7 @@ ecs_service_name       = "ado-ecs-svc"
 ecs_ado_patsecret_name = "ecs-ado-pat-secret"
 
 lambda_memory_size = "128"
-lambda_timeout = "90"
+lambda_timeout = "120"
 
 #todo parametrize for load from environments
 subnet_ids = "subnet-0652671938450949a" // Replace with subnet-id from your account

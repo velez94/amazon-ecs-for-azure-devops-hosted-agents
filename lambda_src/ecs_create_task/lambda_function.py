@@ -47,7 +47,13 @@ def lambda_handler(event, context):
             }
         }
     )
-    
+    print("Starting the program...")
+
+    # Sleep for 30 seconds
+    time.sleep(20)
+
+    print("30 seconds have passed. Continuing with the program.")
+
     lambda_client = boto3.client('lambda')
     lambda_client.invoke(
 

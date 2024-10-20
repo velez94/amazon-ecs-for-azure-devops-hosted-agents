@@ -211,6 +211,7 @@ module "create_task_lambda" {
   lambda_memory_size        = var.lambda_memory_size
   lambda_timeout            = var.lambda_timeout
   create_layer              = false
+
   lambda_concurrency        = 5
   environment_variables = {
     LogLevel               = "INFO"
