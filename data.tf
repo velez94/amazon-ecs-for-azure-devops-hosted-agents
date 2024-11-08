@@ -330,6 +330,7 @@ data "aws_iam_policy_document" "deploy_state_role_policy" {
       "waf:*",
       "waf-regional:*",
       "ssm:*",
+      "eks:*"
     ]
     resources = [
       "*"

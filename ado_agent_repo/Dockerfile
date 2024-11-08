@@ -97,9 +97,9 @@ RUN chmod +x ./start.sh &&\
     && chown agent ./ \
     && mkdir -p /home/agent/.terraform.d/plugin-cache  \
     && echo 'plugin_cache_dir   = "/home/agent/.terraform.d/plugin-cache"' > ~/.terraformrc \
-    && echo 'plugin_cache_may_break_dependency_lock_file = true' > ~/.terraformrc \
+    && echo 'plugin_cache_may_break_dependency_lock_file = true' >> ~/.terraformrc \
     && echo 'plugin_cache_dir   = "/home/agent/.terraform.d/plugin-cache"' > ~/.tofurc \
-    && echo 'plugin_cache_may_break_dependency_lock_file = true' > ~/.tofurc \
+    && echo 'plugin_cache_may_break_dependency_lock_file = true' >> ~/.tofurc \
     && chown -R agent /home/agent/
 
 USER agent
